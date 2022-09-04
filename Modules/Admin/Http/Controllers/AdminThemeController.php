@@ -54,7 +54,7 @@ class AdminThemeController extends Controller
             $zip->renameName('screenshot.png', $imageName);
             $zip->extractTo(storage_path('app/public/images/themes/' . $date->year), array($imageName));
             $inputs['images'] = 'images/themes/' . $date->year . '/' . $imageName;
-            $zip->extractTo(env('CLIENT_PATH') . '/src/themes/' . $inputs['slug']);
+            $zip->extractTo(base_path() . '/' . env('CLIENT_PATH') . '/src/themes/' . $inputs['slug']);
             exec('cd ' . env('CLIENT_PATH') . ' && npm run build');
             $zip->close();
         } else {
