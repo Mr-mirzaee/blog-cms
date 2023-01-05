@@ -32,10 +32,8 @@ class AdminCategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         $inputs = $request->all();
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = $this->createSlug($request->name, '-');
-        }
-        Category::create($inputs);
+        !request()->filled('slug') && $inputs['slug'] = $this->createSlug($request->name, '-');
+        Category::query()->create($inputs);
         return redirect()->route('categories.index');
     }
 
@@ -46,16 +44,15 @@ class AdminCategoryController extends Controller
 
     public function edit(Category $category)
     {
-        $categories = Category::latest()->get();
+        $categories = Category::query()->latest()->get();
         return view('admin::categories.edit', compact('category', 'categories'));
     }
 
     public function update(StoreCategoryRequest $request, Category $category)
     {
         $inputs = $request->all();
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = $this->createSlug($request->name, '-');
-        }
+        !request()->filled('slug') && $inputs['slug'] = $this->createSlug($request->name, '-');
+
         $category->update($inputs);
         return redirect()->route('categories.index');
     }

@@ -23,16 +23,10 @@ class AdminCommentController extends Controller
 
     public function activate(Comment $comment)
     {
-        if($comment->isApproved()) {
-            $comment->update([
-                'approved' => false,
-            ]);
-        } else {
-            $comment->update([
-                'approved' => true,
-            ]);
-        }
-        return redirect(route('comments.index'));
+        $comment->isApproved() ?
+            $comment->update(['approved' => false,]) :
+            $comment->update(['approved' => true]);
+        return redirect()->route('comments.index');
     }
 
     public function create()

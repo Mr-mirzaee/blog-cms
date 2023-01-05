@@ -13,7 +13,7 @@ class HomeController extends Controller
 {
     public function base()
     {
-        $theme = Theme::where('active', 1)->first();
+        $theme = Theme::query()->where('active', 1)->first();
         return new BaseResource($theme);
     }
 

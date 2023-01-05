@@ -30,10 +30,8 @@ class AdminTagController extends Controller
     public function store(StoreTagRequest $request)
     {
         $inputs = $request->all();
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = $this->createSlug($request->name, '-');
-        }
-        Tag::create($inputs);
+        !request()->filled('slug') && $inputs['slug'] = $this->createSlug($request->name, '-');
+        Tag::query()->create($inputs);
         return redirect()->route('tags.index');
     }
 
@@ -50,9 +48,7 @@ class AdminTagController extends Controller
     public function update(StoreTagRequest $request, Tag $tag)
     {
         $inputs = $request->all();
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = $this->createSlug($request->name, '-');
-        }
+        !request()->filled('slug') && $input['slug'] = $this->createSlug($request->name, '-');
         $tag->update($inputs);
         return redirect()->route('tags.index');
     }

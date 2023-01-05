@@ -28,7 +28,8 @@ class AdminThemeController extends Controller
 
     public function activate(Theme $theme)
     {
-        DB::update('UPDATE themes SET active = ( id = ' . $theme->id . ')');
+        $theme->active = !$theme->active;
+        $theme->save();
         return redirect(route('themes.index'));
     }
 
@@ -40,30 +41,27 @@ class AdminThemeController extends Controller
     public function store(StoreThemeRequest $request)
     {
         $inputs = $request->all();
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = Str::slug($request->name, '-');
-        }
+        !request()->filled('slug') && $inputs['slug'] = Str::slug($request->name, '-');
         $file = $inputs['file'];
         $date = Carbon::now();
         $fileName = $date->timestamp . '_' . $file->getClientOriginalName();
         $inputs['size'] = $this->formatBytes($file->getSize());
         $zip = new ZipArchive;
         $zipFile = $zip->open($file);
-        if ($zipFile === TRUE) {
-            $imageName = pathinfo($fileName, PATHINFO_FILENAME) . '.png';
-            $zip->renameName('screenshot.png', $imageName);
-            $zip->extractTo(storage_path('app/public/images/themes/' . $date->year), array($imageName));
-            $inputs['images'] = 'images/themes/' . $date->year . '/' . $imageName;
-            $zip->extractTo(base_path() . '/' . env('CLIENT_PATH') . '/src/themes/' . $inputs['slug']);
-            exec('cd ' . env('CLIENT_PATH') . ' && npm run build');
-            $zip->close();
-        } else {
+        if ($zipFile !== TRUE) {
             return redirect()->back()->withErrors(['file' => 'فقط فایل ZIP مجاز است']);
         }
+        $imageName = pathinfo($fileName, PATHINFO_FILENAME) . '.png';
+        $zip->renameName('screenshot.png', $imageName);
+        $zip->extractTo(storage_path('app/public/images/themes/' . $date->year), array($imageName));
+        $inputs['images'] = 'images/themes/' . $date->year . '/' . $imageName;
+        $zip->extractTo(base_path() . '/' . env('CLIENT_PATH') . '/src/themes/' . $inputs['slug']);
+        exec('cd ' . env('CLIENT_PATH') . ' && npm run build');
+        $zip->close();
         $inputs['file'] = $file->storeAs(
             '/themes', $fileName, 'local'
         );
-        Theme::create($inputs);
+        Theme::query()->create($inputs);
         return redirect()->route('themes.index');
     }
 

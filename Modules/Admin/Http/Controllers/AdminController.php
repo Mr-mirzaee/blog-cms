@@ -13,9 +13,9 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $countUsers = count(User::all());
-        $countPosts = count(Post::all());
-        $theme = Theme::where('active', 1)->first();
+        $countUsers = User::query()->count();
+        $countPosts = Post::query()->count();
+        $theme = Theme::query()->where('active', 1)->first();
         return view('admin::dashboard', compact('countUsers', 'countPosts', 'theme'));
     }
 

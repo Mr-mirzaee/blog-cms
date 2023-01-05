@@ -28,22 +28,16 @@ class AdminPostController extends Controller
 
     public function activate(Post $post)
     {
-        if($post->isApproved()) {
-            $post->update([
-                'approved' => false,
-            ]);
-        } else {
-            $post->update([
-                'approved' => true,
-            ]);
-        }
-        return redirect(route('posts.index'));
+        $post->isApproved() ?
+            $post->update(['approved' => false]) :
+            $post->update(['approved' => true]);
+        return redirect()->route('posts.index');
     }
 
     public function create()
     {
-        $categories = Category::latest()->whereNull('parent_id')->get();
-        $tags = Tag::latest()->get();
+        $categories = Category::query()->latest()->whereNull('parent_id')->get();
+        $tags = Tag::query()->latest()->get();
         return view('admin::posts.create', compact('categories', 'tags'));
     }
 
@@ -51,9 +45,7 @@ class AdminPostController extends Controller
     {
         $inputs = $request->except(['categories', 'image']);
         $imagesUrl = $this->uploadImages($request->file('image'), '/images/posts');
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = $this->createSlug($request->title, '-');
-        }
+        !request()->filled('slug') && $inputs['slug'] = $this->createSlug($request->title, '-');
         $post = auth()->user()->posts()->create(
             array_merge($inputs, ['images' => $imagesUrl])
         );
@@ -69,17 +61,15 @@ class AdminPostController extends Controller
 
     public function edit(Post $post)
     {
-        $categories = Category::latest()->whereNull('parent_id')->get();
-        $tags = Tag::latest()->get();
+        $categories = Category::query()->latest()->whereNull('parent_id')->get();
+        $tags = Tag::query()->latest()->get();
         return view('admin::posts.edit', compact('post', 'categories', 'tags'));
     }
 
     public function update(Request $request, Post $post)
     {
         $inputs = $request->except(['categories']);
-        if(!request()->filled('slug')) {
-            $inputs['slug'] = $this->createSlug($request->title, '-');
-        }
+        !request()->filled('slug') && $inputs['slug'] = $this->createSlug($request->title, '-');
         if($request->hasFile('image')) {
             Storage::disk('public')->delete('/' . $post->images);
             $inputs['images'] = $this->uploadImages($request->file('image'), '/images/posts');

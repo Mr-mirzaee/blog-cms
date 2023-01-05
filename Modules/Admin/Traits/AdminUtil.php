@@ -20,8 +20,7 @@ Trait AdminUtil
     {
         // \x{0600}-\x{06FF} is the persian characters ranges
         $str = preg_replace('/[^A-Za-z0-9\x{0600}-\x{06FF}-]+/u', $char, $str);
-        $str = trim($str, $char);
-        return $str;
+        return trim($str, $char);
     }
 
     function formatBytes($bytes, $precision = 2) {

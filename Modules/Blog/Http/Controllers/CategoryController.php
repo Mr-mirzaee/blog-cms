@@ -11,7 +11,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        return CategoryResource::collection(Category::latest()->whereNull('parent_id')->get());
+        return CategoryResource::collection(Category::query()->latest()->whereNull('parent_id')->get());
     }
 
     public function store(Request $request)

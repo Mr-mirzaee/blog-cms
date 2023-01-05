@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        User::create([
+        User::query()->create([
             'name' => $request->get('name'),
             'family' => $request->get('family'),
             'mobile' => $request->get('mobile'),
@@ -26,7 +26,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        $user = User::where('mobile', $request->mobile)->first();
+        $user = User::query()->where('mobile', $request->mobile)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response(['errors' => ['mobile' => 'اطلاعات ورود اشتباه است']], 403);
         }
